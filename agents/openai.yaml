@@ -1,0 +1,6 @@
+interface:
+  display_name: "组合估值消化体检"
+  short_description: "批量核验增长能否消化估值与现金流质量"
+  default_prompt: "Use $ks-valuation-digestion-check to audit whether EPS growth can absorb the valuation of my ticker basket."
+policy:
+  allow_implicit_invocation: true
