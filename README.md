@@ -1,25 +1,52 @@
-# ks-valuation-digestion-check
+# ks-valuation-digestion-check · 估值消化体检 📈
 
-**估值消化检查**：核验 EPS 增长、估值口径与现金流质量的只读研究工作流。
+> *Read-only "can EPS growth digest this valuation" screen for a basket of tickers.*
 
-## 安装
+「这股票 60 倍 PE，贵不贵？」
 
-本仓库根目录即技能目录。任选当前使用的宿主安装：
+这个问题本身就问错了。正确的问法是：**未来两三年的真实 EPS 增长，能不能把这个估值消化到合理区间？** 增长是真的还是并购堆的？现金流跟得上吗？周期顶的低 PE 是不是假象？
+
+这个 skill 把这个问题拆成一张可核查的表。
+
+## 🧮 它怎么算
+
+对每个 ticker 在线取五样东西，**每样都带日期和来源**：
+
+1. 💵 最新价（币种、交易所、时点）
+2. 🔭 前瞻 12 个月 P/E（口径注明；负 EPS 就写「无 PE」，不硬算）
+3. 📊 未来 2～3 年 EPS 共识，自算 CAGR（只有单年增速时**不冒充** CAGR）
+4. ➗ PEG = forward P/E ÷ EPS CAGR
+5. 🧾 EPS 质量：有机还是并购、一次性收益、股本变化、GAAP/非 GAAP、FCF 正负
+
+然后给四档裁决：**成立 / 边界 / 不成立（透支或借钱买增长）/ 框架不适用**。
+
+## 🪤 它主动拦三个陷阱
+
+- 🏦 **并购买增长** —— EPS 涨但 FCF 弱，PEG 失真
+- ⛰️ **周期顶低 PE** —— 峰值盈利压出来的便宜，不是便宜
+- ❌ **没有正 EPS** —— PEG 无数学意义，直接判「框架不适用」，不强算
+
+## 💬 你说什么，它给什么
+
+你说：「体检一下 NVDA MDB MA OKTA FTNT」
+
+它还你一张固定字段的表（price / forward_pe / cagr / peg / eps_quality / growth_driver / verdict / one_line），下面跟三段：**data_gaps**（哪个字段没找到或口径冲突）、**sources**（按 ticker 分组的链接和日期）、**method_notes**（CAGR 年限、PEG 算法）。
+
+多组 ticker 时会派 agent 并行，但 PEG 一律由主线程复算，异常值自己再核一遍。
+
+## ⚠️ 它不是什么
+
+不是买卖建议。它是研究筛查，把「事实 / 计算 / 判断」分开写清楚，扣扳机的永远是你。
+
+## ⚙️ 安装
 
 ```bash
 # Claude Code
 git clone https://github.com/KaiSky0823/ks-valuation-digestion-check.git ~/.claude/skills/ks-valuation-digestion-check
-
 # Codex
 git clone https://github.com/KaiSky0823/ks-valuation-digestion-check.git ~/.agents/skills/ks-valuation-digestion-check
 ```
 
-目标目录已存在时，在该目录检查改动后更新，避免覆盖本地修改。
+## License
 
-## 使用
-
-Claude Code 使用 `/ks-valuation-digestion-check`；Codex 使用 `$ks-valuation-digestion-check`，并附上具体任务、材料与约束。自动发现取决于宿主设置。工作流正文见 [SKILL.md](SKILL.md)。
-
-## 运行要求
-
-需要当前宿主提供文件读取与任务所需工具。涉及事实、行情或外部资料时需要网络检索；多 agent 流程依赖当前宿主提供的协作能力。工具缺失时应明确报告，不能虚构调用或结果。
+MIT © 2026 KaiSky0823
